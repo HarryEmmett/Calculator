@@ -7,7 +7,7 @@ const subtract = (num, num2) => {
 };
 
 const divide = (num, num2) => {
-  return num2 === 0 ? "You can't divide by 0" : num / num2;
+  return num2 === 0 ? "Can't divide by 0" : num / num2;
 };
 
 const multiply = (num, num2) => {

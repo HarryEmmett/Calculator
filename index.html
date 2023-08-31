@@ -8,32 +8,36 @@
   </head>
   <body>
     <div class="container">
-        <div class="display-screen-container">
-            <div>hidden</div>
-            <div>screen content</div>
-        </div>
-        <div class="top-buttons-container">
-            <button class="top-buttons-container" id="clear-button">CLEAR</button>
-            <button class="top-buttons-container" id="delete-button">DELETE</button>
-        </div>
-        <div>
-            <button>1</button>
-            <button>2</button>
-            <button>3</button>
-            <button>+</button>
-            <button>4</button>
-            <button>5</button>
-            <button>6</button>
-            <button>-</button>
-            <button>7</button>
-            <button>8</button>
-            <button>9</button>
-            <button>/</button>
-            <button>.</button>
-            <button>0</button>
-            <button>=</button>
-            <button>*</button>
-        </div>
+      <div class="display-screen-container">
+        <div class="hidden-div"></div>
+        <div class="content-div">0</div>
+      </div>
+      <div class="top-buttons-container">
+        <button class="top-buttons-container" id="clear-button" value="clear">
+          CLEAR
+        </button>
+        <button class="top-buttons-container" id="delete-button" value="delete">
+          DELETE
+        </button>
+      </div>
+      <div>
+        <button class="numbers" value="1">1</button>
+        <button class="numbers" value="2">2</button>
+        <button class="numbers" value="3">3</button>
+        <button class="operations" value="+">+</button>
+        <button class="numbers" value="4">4</button>
+        <button class="numbers" value="5">5</button>
+        <button class="numbers" value="6">6</button>
+        <button class="operations" value="-">-</button>
+        <button class="numbers" value="7">7</button>
+        <button class="numbers" value="8">8</button>
+        <button class="numbers" value="9">9</button>
+        <button class="operations" value="/">/</button>
+        <button class="operations" value=".">.</button>
+        <button class="numbers" value="0">0</button>
+        <button class="operations" value="=">=</button>
+        <button class="operations" value="*">*</button>
+      </div>
     </div>
     <script src="calculator.js"></script>
     <script src="scripts.js"></script>
