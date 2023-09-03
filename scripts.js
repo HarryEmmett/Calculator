@@ -50,7 +50,7 @@ const handleOperation = (value) => {
 
   const numbers = topDisplayValue?.split(` ${currentOperation} `);
 
-  // add a 0 if "." is pressed
+  // add a 0 if "." is pressed to iniate a number
   if (value === ".") {
     if (!topDisplayValue || topDisplayValue === "-") {
       let modifyDecimal = `0${value}`;
