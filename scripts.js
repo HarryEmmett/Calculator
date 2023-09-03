@@ -6,134 +6,158 @@ const deleteButton = document.querySelector("#delete-button");
 const topDisplay = document.querySelector(".hidden-div");
 const bottomDisplay = document.querySelector(".content-div");
 
-const operations = ["+", "-", "/", "*"];
-
 let bottomDisplayValue;
 let topDisplayValue;
 let currentOperation;
 
-const checkRepeats = (num, operater) => {
-  return (
-    num?.includes(operater) ||
-    (num?.substring(topDisplayValue.length - 1) === "." &&
-      operations?.includes(operater))
-  );
+const addNumber = (value) => {
+  if (topDisplayValue && topDisplayValue !== "0") {
+    topDisplayValue += value;
+    topDisplay.innerText = topDisplayValue;
+  } else {
+    topDisplayValue = value;
+    topDisplay.innerText = value;
+  }
 };
 
-const handleOperatorSelection = (operator) => {
-  const regex = /[+\/\-*]$/;
-  let values;
-
-  values = topDisplayValue.split(currentOperation);
- 
-  if (operator === ".") {
-    if (regex.test(topDisplayValue) && !values[1]) {
-      // Add a 0 if second number initated with "."
-      topDisplayValue += `0`;
-    }
-  }
-
-  if (currentOperation && operator !== ".") {
-    if (regex.test(topDisplayValue)) {
-      let string = `${values[0]} ${operator} `;
-      if (values[1]) {
-        string += `${values[1]}`;
-      }
-
-      return (topDisplayValue = string);
-    }
-  }
-
-  return (topDisplayValue += `${operator}`);
-};
-
-const generateTopText = (newVal, operator = false) => {
-  if (topDisplayValue === "0" && !operator) {
-    return (topDisplayValue = newVal);
+const validOperation = (value) => {
+  if (bottomDisplayValue && !topDisplayValue) {
+    return value === "." || value === "=";
   }
 
   if (!topDisplayValue) {
-    if (operator) {
-      return (topDisplayValue = `0${operator}`);
-    }
-
-    return (topDisplayValue = newVal);
+    return operations.includes(value) || value === "=";
+  }
+  if (value === "-") {
+    return topDisplayValue === "-";
   }
 
-  if (operator) {
-    topDisplayValue = handleOperatorSelection(operator);
-  }
-
-  if (newVal) {
-    topDisplayValue += `${newVal}`;
-  }
-
-  return topDisplayValue;
+  return (
+    operations.includes(
+      topDisplayValue?.substring(topDisplayValue.length - 1)
+    ) && operations.includes(value)
+  );
 };
 
 const handleOperation = (value) => {
-  const num1 = topDisplayValue?.split(currentOperation)[0];
-  const num2 = topDisplayValue?.split(currentOperation)[1];
-
-  if (
-    (num2 && checkRepeats(num2, value)) ||
-    (value === currentOperation && num2)
-  ) {
-    return alert("invalid selection");
+  if (validOperation(value)) {
+    return alert("Invalid selection");
   }
 
-  if (!num2 && checkRepeats(num1, value)) {
+  if (bottomDisplayValue === "Can't divide by 0") {
+    return alert("Please clear before contiuning");
+  }
+
+  const numbers = topDisplayValue?.split(` ${currentOperation} `);
+
+  // add a 0 if "." is pressed
+  if (value === ".") {
+    if (!topDisplayValue || topDisplayValue === "-") {
+      let modifyDecimal = `0${value}`;
+      if (topDisplayValue) {
+        modifyDecimal = `-${modifyDecimal}`;
+      }
+      topDisplayValue = modifyDecimal;
+      topDisplay.innerText = modifyDecimal;
+      return;
+    }
+
+    if (operations.includes(topDisplayValue[topDisplayValue.length - 2])) {
+      topDisplayValue += ` 0${value}`;
+      topDisplay.innerText += ` 0${value}`;
+      return;
+    }
+
+    if (numbers[1] === " -") {
+      topDisplayValue += `0${value}`;
+      topDisplay.innerText += `0${value}`;
+      return;
+    }
+
+    if (numbers.length === 1 && numbers[0].includes(".")) {
+      return alert("invalid operation");
+    }
+
+    if (numbers.length === 2 && numbers[1].includes(".")) {
+      return alert("invalid operation");
+    }
+
+    topDisplayValue += `${value}`;
+    topDisplay.innerText += `${value}`;
+
+    return;
+  }
+
+  if (value === "-") {
     if (
-      !operations.includes(
-        topDisplayValue?.substring(topDisplayValue.length - 1)
-      )
+      operations.includes(topDisplayValue?.[topDisplayValue?.length - 2]) &&
+      !numbers[1]
     ) {
-      return alert("invalid selection");
+      console.log("1");
+      topDisplayValue += ` -`;
+      topDisplay.innerText += ` -`;
+      return;
+    } else {
+      if (!bottomDisplayValue && topDisplayValue && numbers?.[1]) {
+        return alert("Invalid operation");
+      }
+
+      if (!topDisplayValue) {
+        topDisplayValue = `${value}`;
+        topDisplay.innerText = `${topDisplayValue}`;
+        currentOperation = value;
+        return;
+      } 
     }
   }
 
-  if (value === "+" || value === "-" || value === "/" || value === "*") {
-    if (!topDisplayValue) {
-      return alert("Select a number first");
+  if (value === "+" || value === "/" || value === "*" || value === "-") {
+    if (!topDisplayValue?.split(` ${currentOperation} `)[1]) {
+      topDisplayValue = topDisplayValue?.split(` ${currentOperation} `)[0];
+      currentOperation = value;
+    } else {
+      return alert("Invalid operation");
     }
-    
-    if (topDisplayValue.split(currentOperation)[1]) {
-      return alert("You have already selected two numbers");
-    }
-
-    currentOperation = value;
   }
 
   if (value === "=") {
-    if (
-      currentOperation === "+" ||
-      currentOperation === "-" ||
-      currentOperation === "/" ||
-      currentOperation === "*"
-    ) {
-      if (num1 && num2) {
-        bottomDisplayValue = operate(currentOperation, num1, num2);
-        if (bottomDisplayValue !== "Can't divide by 0") {
-          topDisplayValue = bottomDisplayValue.toString();
-          topDisplay.innerText = bottomDisplayValue.toString();
-        } else {
-          topDisplayValue = undefined;
-          topDisplay.innerText = "";
-        }
-
-        bottomDisplay.innerText = bottomDisplayValue.toString();
+    if (!topDisplayValue.split(` ${currentOperation} `)[1]) {
+      return alert("Enter two numbers");
+    }
+    const result = operate(
+      currentOperation,
+      bottomDisplayValue || topDisplayValue.split(` ${currentOperation} `)[0],
+      topDisplayValue.split(` ${currentOperation} `)[1]
+    );
+    topDisplayValue = undefined;
+    topDisplay.innerText = "";
+    bottomDisplay.innerText = result;
+    bottomDisplayValue = result;
+    currentOperation = undefined;
+  } else {
+    if (!topDisplayValue) {
+      bottomDisplayValue
+        ? (topDisplayValue = `${bottomDisplayValue} ${value} `)
+        : (topDisplayValue = value);
+      topDisplay.innerText = topDisplayValue;
+      currentOperation = value;
+    } else {
+      if (numbers.length === 1) {
+        topDisplayValue += ` ${value} `;
+        topDisplay.innerText = ` ${topDisplayValue} `;
+        currentOperation = value;
       } else {
-        alert("Enter 2 numbers!");
+        topDisplayValue += ` ${value} `;
+        topDisplay.innerText = ` ${topDisplayValue} `;
+        currentOperation = value;
       }
     }
-  } else {
-    topDisplay.innerText = `${generateTopText(undefined, value)}`;
   }
 };
 
 numberButtons.forEach((btn) => {
   btn.addEventListener("click", (e) => {
-    topDisplay.innerText = `${generateTopText(e.target.value)}`;
+    addNumber(e.target.value);
   });
 });
 
@@ -155,7 +179,11 @@ deleteButton.addEventListener("click", (e) => {
   if (!topDisplayValue) {
     alert("Nothing to delete");
   } else {
-    topDisplayValue = topDisplayValue.slice(0, -1);
+    if (topDisplayValue.substring(topDisplayValue.length - 1) === " ") {
+      topDisplayValue = topDisplayValue.slice(0, -2);
+    } else {
+      topDisplayValue = topDisplayValue.slice(0, -1);
+    }
     topDisplay.innerText = topDisplayValue;
   }
 });
@@ -207,11 +235,11 @@ document.addEventListener("keypress", (e) => {
     }
 
     if (!e.shiftKey) {
-      topDisplay.innerText = `${generateTopText(
+      addNumber(
         e.code.split("Digit")[1]
           ? e.code.split("Digit")[1]
           : e.code.split("Numpad")[1]
-      )}`;
+      );
     }
   }
 });

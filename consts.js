@@ -1,3 +1,6 @@
+
+const operations = ["+", "/", "*"];
+
 const keys = [
   "Digit1",
   "Digit2",
