@@ -6,125 +6,69 @@ const deleteButton = document.querySelector("#delete-button");
 const topDisplay = document.querySelector(".hidden-div");
 const bottomDisplay = document.querySelector(".content-div");
 
-let bottomDisplayValue;
-let topDisplayValue;
 let currentOperation;
-let number1;
-let number2 = 0;
+let number1 = "";
+let number2 = "";
 
 const addNumber = (value) => {
-  if (bottomDisplayValue && bottomDisplayValue !== "0") {
-    bottomDisplayValue += value;
-    bottomDisplay.innerText = bottomDisplayValue;
-
-    if (currentOperation) {
-      return (number2 = number2 ? number2 + value : value);
-    }
-    number1 += value;
-  } else {
-    bottomDisplayValue = value;
-    bottomDisplay.innerText = bottomDisplayValue;
-    if (currentOperation) {
-      return (number2 = value);
-    }
-    number1 = value;
-  }
-};
-
-const handleOperation = (value) => {
-  if (!number1 && !topDisplayValue && value !== "." && value !== "-") {
-    return alert("enter a number");
-  }
-
   if (value === ".") {
-    if (!number1 && !currentOperation) {
-      bottomDisplayValue = "0" + value;
-      bottomDisplay.innerText = bottomDisplayValue;
-      number1 = "0.";
-      return;
-    }
-
-    if (!number2 && currentOperation) {
-      bottomDisplayValue += "0" + value;
-      bottomDisplay.innerText = bottomDisplayValue;
-      number2 = "0.";
-      return;
-    }
-
-    if (!number2 && !number1?.toString().includes(".")) {
-      bottomDisplayValue += value;
-      bottomDisplay.innerText = bottomDisplayValue;
-      number1 += value;
-      return;
-    }
-
-    if (number2 && !number2.toString().includes(".")) {
-      bottomDisplayValue += value;
-      bottomDisplay.innerText = bottomDisplayValue;
-      number2 += value;
-      return;
-    }
-    return alert("No double decimals");
-  }
-
-  if (value === "+" || value === "-" || value === "*" || value === "/") {
-    if (number1?.[number1?.length - 1] === "." || number2) {
-      return alert("Invalid selection");
+    if (!number1 || (!number2 && currentOperation)) {
+      value = "0.";
     }
 
     if (
-      (value === "-" && !number1 && number1 !== 0 && !topDisplayValue) ||
-      number1 === "-"
+      (number1?.includes(".") && !currentOperation) ||
+      number2?.includes(".")
     ) {
-      if (number1 === "-") {
-        return alert("Invalid selection");
-      }
+      return alert("No double decimal");
+    }
+  }
+  let updatedNumber = !currentOperation
+    ? (number1 += value)
+    : (number2 += value);
+  !currentOperation ? (number1 = updatedNumber) : (number2 = updatedNumber);
 
-      currentOperation = value;
+  bottomDisplay.innerHTML = `${number1} ${currentOperation || ""} ${
+    number2 || ""
+  }`;
+};
+
+const handleOperation = (value) => {
+  if (value === "-") {
+    if (!number1) {
       number1 = value;
-      bottomDisplayValue = value;
-      bottomDisplay.innerText = bottomDisplayValue;
+      bottomDisplay.innerHTML = "-";
       return;
     }
-    if (currentOperation) {
-      currentOperation = value;
-      bottomDisplayValue = `${bottomDisplayValue.slice(0, -2)} ${value} `;
-      bottomDisplay.innerText = bottomDisplayValue;
-      return;
+  }
+
+  if (operations.includes(value) && !number1) {
+    return alert("Invalid selection");
+  }
+
+  if (value === "=") {
+    if (!number1 || !number2 || !currentOperation) {
+      return alert("Invalid selection");
     }
 
-    if (!topDisplayValue) {
-      currentOperation = value;
-      bottomDisplayValue += ` ${value} `;
-      bottomDisplay.innerText += ` ${value} `;
-      return;
+    let result = operate(currentOperation, number1, number2);
+
+    if (typeof result === "number") {
+      result = Math.round(result * 10000) / 10000;
     }
 
-    currentOperation = value;
-    bottomDisplayValue = `${bottomDisplayValue} ${value} `;
-    bottomDisplay.innerText = bottomDisplayValue;
+    bottomDisplay.innerHTML = result.toString();
+    topDisplay.innerText = typeof result === "number" ? result.toString() : "";
+    number1 = typeof result === "number" ? result.toString() : "0";
+    number2 = "";
+    currentOperation = undefined;
     return;
   }
 
-  if (value === "=" && currentOperation) {
-    if (!number2) {
-      return alert("enter a second number");
-    }
-    
-    const result = operate(
-      currentOperation,
-      topDisplayValue ? topDisplayValue : number1,
-      number2
-    );
-
-    currentOperation = undefined;
-    number1 = undefined;
-    number2 = 0;
-    topDisplayValue = result;
-    bottomDisplayValue = result;
-    topDisplay.innerHTML = result;
-    bottomDisplay.innerHTML = result;
-  }
+  currentOperation = value;
+  bottomDisplay.innerHTML = `${number1} ${currentOperation || ""} ${
+    number2 || ""
+  }`;
 };
 
 numberButtons.forEach((btn) => {
@@ -139,42 +83,37 @@ operationButtons.forEach((btn) => {
   });
 });
 
-clearButton.addEventListener("click", (e) => {
+clearButton.addEventListener("click", () => {
   topDisplay.innerText = "";
-  bottomDisplay.innerText = 0;
-  topDisplayValue = undefined;
-  bottomDisplayValue = undefined;
+  bottomDisplay.innerText = "0";
   currentOperation = undefined;
+  number1 = "";
+  number2 = "";
 });
 
-deleteButton.addEventListener("click", (e) => {
-  if (!bottomDisplayValue) {
+deleteButton.addEventListener("click", () => {
+  if (!number1) {
     alert("Nothing to delete");
   } else {
-    bottomDisplayValue = bottomDisplayValue.slice(0, -1);
-    bottomDisplay.innerText = bottomDisplayValue;
-    topDisplayValue = bottomDisplayValue.slice(0, -1);
-    number1 = bottomDisplayValue?.split(` ${currentOperation} `)[0];
-
-    if (number1[number1.length - 1] === ".") {
-      number1.slice(0, -1);
-      bottomDisplayValue = bottomDisplayValue.slice(0, -1);
-      bottomDisplay.innerText = bottomDisplayValue;
-      topDisplayValue = bottomDisplayValue.slice(0, -1);
-    }
-    currentOperation = undefined;
-    if ((number2 = bottomDisplayValue?.split(` ${currentOperation} `)[1])) {
-      number2 = bottomDisplayValue?.split(` ${currentOperation} `)[1];
-
+    if (number2) {
+      number2 = number2.slice(0, -1);
       if (number2[number2.length - 1] === ".") {
-        number2.slice(0, -1);
-        bottomDisplayValue = bottomDisplayValue.slice(0, -1);
-        bottomDisplay.innerText = bottomDisplayValue;
-        topDisplayValue = bottomDisplayValue.slice(0, -1);
-        currentOperation = undefined;
+        number2 = number2.slice(0, -1);
       }
-      return;
+    } else {
+      currentOperation === undefined;
+      number1 = number1.slice(0, -1);
+      if (number1[number1.length - 1] === ".") {
+        number1 = number1.slice(0, -1);
+      }
     }
+
+    if (!number2) {
+      currentOperation = undefined;
+    }
+    bottomDisplay.innerText = `${number1} ${currentOperation || ""} ${
+      number2 || ""
+    }`;
   }
 });
 
@@ -211,7 +150,7 @@ document.addEventListener("keypress", (e) => {
             return handleOperation("/");
           case "Period":
           case "NumpadDecimal":
-            return handleOperation(".");
+            return addNumber(".");
           case "Equal":
             return handleOperation("=");
           case "NumpadAdd":
