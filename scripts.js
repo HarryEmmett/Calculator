@@ -93,7 +93,6 @@ const handleOperation = (value) => {
       operations.includes(topDisplayValue?.[topDisplayValue?.length - 2]) &&
       !numbers[1]
     ) {
-      console.log("1");
       topDisplayValue += ` -`;
       topDisplay.innerText += ` -`;
       return;
