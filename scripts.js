@@ -33,6 +33,33 @@ const addNumber = (value) => {
   }`;
 };
 
+const handleDelete = () => {
+  if (number1 === "") {
+    bottomDisplay.innerText = "0";
+    return alert("Nothing to delete");
+  } else {
+    if (number2) {
+      number2 = number2.slice(0, -1);
+      if (number2[number2.length - 1] === ".") {
+        number2 = number2.slice(0, -1);
+      }
+    } else {
+      currentOperation === undefined;
+      number1 = number1.slice(0, -1);
+      if (number1[number1.length - 1] === ".") {
+        number1 = number1.slice(0, -1);
+      }
+    }
+
+    if (!number2) {
+      currentOperation = undefined;
+    }
+    bottomDisplay.innerText = `${number1 || "0"} ${currentOperation || ""} ${
+      number2 || ""
+    }`;
+  }
+};
+
 const handleOperation = (value) => {
   if (value === "-") {
     if (!number1) {
@@ -92,32 +119,14 @@ clearButton.addEventListener("click", () => {
 });
 
 deleteButton.addEventListener("click", () => {
-  if (!number1) {
-    alert("Nothing to delete");
-  } else {
-    if (number2) {
-      number2 = number2.slice(0, -1);
-      if (number2[number2.length - 1] === ".") {
-        number2 = number2.slice(0, -1);
-      }
-    } else {
-      currentOperation === undefined;
-      number1 = number1.slice(0, -1);
-      if (number1[number1.length - 1] === ".") {
-        number1 = number1.slice(0, -1);
-      }
-    }
-
-    if (!number2) {
-      currentOperation = undefined;
-    }
-    bottomDisplay.innerText = `${number1} ${currentOperation || ""} ${
-      number2 || ""
-    }`;
-  }
+  handleDelete();
 });
 
-document.addEventListener("keypress", (e) => {
+document.addEventListener("keydown", (e) => {
+  if(e.code === "Backspace") handleDelete();
+});
+
+document.addEventListener("keydown", (e) => {
   if (keys.includes(e.code)) {
     if (
       e.code === "Minus" ||
