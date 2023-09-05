@@ -34,13 +34,13 @@ const addNumber = (value) => {
 };
 
 const sliceString = (string) => {
-  string.slice(0, -1);
+  let slice = string.slice(0, -1);
 
   // extra slice to remove "." if at the end of the string
-  if (string[string.length - 1] === ".") {
-    string.slice(0, -1);
+  if (slice[slice.length - 1] === ".") {
+    slice = slice.slice(0, -1);
   }
-  return string;
+  return slice;
 };
 
 const handleDelete = () => {
@@ -51,8 +51,8 @@ const handleDelete = () => {
     if (number2) {
       number2 = sliceString(number2);
     } else {
-      currentOperation === undefined;
-      number1 = sliceString(number2);
+      number1 = sliceString(number1);
+      currentOperation = undefined;
     }
 
     bottomDisplay.innerText = `${number1 || "0"} ${currentOperation || ""} ${
