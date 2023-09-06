@@ -69,6 +69,10 @@ const handleOperation = (value) => {
       return;
     }
   }
+  
+  if(number1[number1.length - 1] === ".") {
+    return alert("Invalid selection");
+  }
 
   if (operations.includes(value) && !number1) {
     return alert("Invalid selection");
